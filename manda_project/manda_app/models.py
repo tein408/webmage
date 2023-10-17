@@ -41,7 +41,7 @@ class MandaSub(models.Model):
 #실천목표
 class MandaContent(models.Model):
     sub_id = models.ForeignKey(MandaSub, on_delete=models.CASCADE)  # 외래키로 MandaSub와 연결
-    success = models.BigIntegerField()  # 성공 여부, bigint 타입
+    success_count = models.BigIntegerField()  # 성공 여부, bigint 타입
     content = models.CharField(max_length=20)  # 콘텐츠, 최대 길이 20
 
     def __str__(self):
