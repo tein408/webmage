@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.conf.urls.static import static
 
 from .manda_urls.urls_user import urlpatterns as manda_user_urls
-from .manda_urls.url_write import urlpatterns as manda_write_urls
+from .manda_urls.urls_write import urlpatterns as manda_write_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
