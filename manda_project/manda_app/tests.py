@@ -1,7 +1,3 @@
-import coverage
-cov = coverage.Coverage()
-cov.start()
-
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -14,12 +10,10 @@ class LoginAPITest(TestCase):
         self.login_url = reverse('login')
         self.user_data = {
             'username': 'testuser',
-            'email': 'test@example.com',
             'password': 'testpassword'
         }
         self.user = User.objects.create_user(
             username='testuser',
-            email='test@example.com',
             password='testpassword'
         )
 
@@ -30,7 +24,6 @@ class LoginAPITest(TestCase):
     def test_login_invalid_user(self):
         invalid_data = {
             'username': 'nottestuser',
-            'email': 'test@example.com',
             'password': 'wrongpassword'
         }
         response = self.client.post(self.login_url, invalid_data, format='json')
@@ -39,7 +32,6 @@ class LoginAPITest(TestCase):
     def test_login_missing_fields(self):
         incomplete_data = {
             'username': 'testuser',
-            'email': 'test@example.com',
         }
         response = self.client.post(self.login_url, incomplete_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -54,7 +46,6 @@ class LoginAPITest(TestCase):
     def test_login_invalid_password(self):
         invalid_password_data = {
             'username': 'testuser',
-            'email': 'test@example.com',
             'password': 'wrongpassword'
         }
         response = self.client.post(self.login_url, invalid_password_data, format='json')
@@ -63,7 +54,3 @@ class LoginAPITest(TestCase):
     def test_invalid_http_method(self):
         response = self.client.get(self.login_url, format='json')
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-cov.stop()
-cov.save()
-cov.html_report()
