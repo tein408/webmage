@@ -1,6 +1,7 @@
 from rest_framework import status
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -9,7 +10,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from ..serializers.user_serializer import UserSerializer
 from .utils import generate_temp_password, send_temp_password_email
-
 
 @csrf_exempt
 def user_login(request):
@@ -68,3 +68,9 @@ def reset_password(request):
         send_temp_password_email(user, temp_password)
 
         return Response({'message': 'Temporary password has been sent to your email address.'}, status=status.HTTP_200_OK)
+    
+@login_required
+def delete_user(request):
+    user = request.user
+    user.delete()
+    return JsonResponse({'message': 'User deleted successfully.'})
