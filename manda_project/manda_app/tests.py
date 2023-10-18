@@ -117,3 +117,30 @@ class UpdateUserAPITest(TestCase):
         data = {'username': '', 'email': '', 'password': 'testpassword'}
         response = self.client.patch(self.update_url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class ResetPasswordAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.reset_password_url = reverse('reset_password')
+        self.user_data = {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'testpassword'
+        }
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpassword'
+        )
+
+    def test_reset_password_valid_email(self):
+        response = self.client.post(self.reset_password_url, {'email': self.user_data['email']}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['message'], 'Temporary password has been sent to your email address.')
+
+    def test_reset_password_invalid_email(self):
+        response = self.client.post(self.reset_password_url, {'email': 'nonexistent@example.com'}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], 'User with this email address does not exist.')
