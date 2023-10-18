@@ -1,6 +1,4 @@
 from django.db import models
-from .models import MandaMain  # MandaMain 모델을 가져오기
-from .models import MandaSub
 from django.contrib.auth.models import User  # User 모델을 가져오기
 
 # Create your models here.
