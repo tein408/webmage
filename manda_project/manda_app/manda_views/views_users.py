@@ -24,3 +24,8 @@ def user_login(request):
             return HttpResponse(status=400)
     else:
         return HttpResponse(status=405)
+    
+@csrf_exempt
+def user_logout(requet):
+    logout(requet)
+    return HttpResponse(status=200)
