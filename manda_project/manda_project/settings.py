@@ -40,8 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_grpc_framework',#grpc프레임워크
-
+    'rest_framework',
     #앱 이름
     'manda_app',
 ]
