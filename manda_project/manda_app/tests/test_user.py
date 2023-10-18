@@ -144,3 +144,35 @@ class ResetPasswordAPITest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data['error'], 'User with this email address does not exist.')
+
+class DeleteUserAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user_data = {
+            'username': 'testuser',
+            'password': 'testpassword'
+        }
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword'
+        )
+        self.login_url = reverse('login')
+        self.delete_url = reverse('delete_user')
+
+    def test_check_existence_of_deleted_user(self):
+        # 로그인
+        response_login = self.client.post(self.login_url, self.user_data, format='json')
+        self.assertEqual(response_login.status_code, status.HTTP_200_OK)
+
+        # 회원탈퇴
+        response_delete = self.client.delete(self.delete_url, format='json')
+        self.assertEqual(response_delete.status_code, status.HTTP_200_OK)
+
+        # 탈퇴 성공 메시지 확인
+        response_data = response_delete.content.decode('utf-8')
+        expected_response_data = '{"message":"User deleted successfully."}'
+        self.assertJSONEqual(response_data, expected_response_data)
+
+        # 탈퇴한 계정 로그인시 실패 확인
+        response_login_after_delete = self.client.post(self.login_url, self.user_data, format='json')
+        self.assertEqual(response_login_after_delete.status_code, status.HTTP_400_BAD_REQUEST)
