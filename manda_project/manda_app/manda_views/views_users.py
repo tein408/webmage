@@ -11,23 +11,20 @@ from rest_framework.permissions import IsAuthenticated
 from ..serializers.user_serializer import UserSerializer
 from .utils import generate_temp_password, send_temp_password_email
 
-@csrf_exempt
+@api_view(['POST'])
 def user_login(request):
-    if request.method == 'POST':
-        data = JSONParser().parse(request)
-        try:
-            username = data['username']
-            password = data['password']
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return HttpResponse(status=200)
-            else:
-                return HttpResponse(status=400)
-        except KeyError:
+    data = JSONParser().parse(request)
+    try:
+        username = data['username']
+        password = data['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return HttpResponse(status=200)
+        else:
             return HttpResponse(status=400)
-    else:
-        return HttpResponse(status=405)
+    except KeyError:
+        return HttpResponse(status=400)
     
 @api_view(['POST'])
 def user_logout(requet):
