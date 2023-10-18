@@ -86,3 +86,34 @@ class RegistrationAPITest(APITestCase):
         data = {'username': '', 'password': 'testpassword'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class UpdateUserAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.update_url = reverse('edit')
+        self.user_data = {
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'testpassword'
+        }
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpassword'
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_update_user_info(self):
+        updated_data = {
+            'username': 'updateduser',
+            'email': 'updated@example.com',
+        }
+        response = self.client.patch(self.update_url, updated_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], updated_data['username'])
+        self.assertEqual(response.data['email'], updated_data['email'])
+
+    def test_invalid_user_edit(self):
+        data = {'username': '', 'email': '', 'password': 'testpassword'}
+        response = self.client.patch(self.update_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
