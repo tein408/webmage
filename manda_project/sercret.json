@@ -1,0 +1,8 @@
+{
+    "SECRET_KEY": "django-insecure-(pe%_udg4tk0+fec^)x*^y%rvt@w!+@r&s-a+c8(mt$j^2@vn6",
+    "postgresql_user": "postgres",
+    "postgresql_name": "",
+    "postgresql_host": "oreumi-dangun.cyxsnajbfbeu.ap-northeast-2.rds.amazonaws.com",
+    "postgresql_port": "5432",
+    "postgresql_pwd": "pwd1234!"
+}
