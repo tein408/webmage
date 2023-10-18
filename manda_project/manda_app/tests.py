@@ -54,3 +54,21 @@ class LoginAPITest(TestCase):
     def test_invalid_http_method(self):
         response = self.client.get(self.login_url, format='json')
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+class LogoutAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.logout_url = reverse('logout')
+        self.user_data = {
+            'username': 'testuser',
+            'password': 'testpassword'
+        }
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword'
+        )
+        self.client.login(username='testuser', password='testpassword')
+
+    def test_user_logout(self):
+        response = self.client.post(self.logout_url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
