@@ -17,8 +17,9 @@ def send_temp_password_email(user, temp_password):
         "message": temp_password,
     }
     receive_email = [user.email]
+    from_email = 'Manda 웹법사 <webmage_manda@naver.com>'
     emailContent = render_to_string('email.html', content)
 
-    emailObject = EmailMessage(title, emailContent, to=receive_email)
+    emailObject = EmailMessage(subject=title, body=emailContent, to=receive_email, from_email=from_email)
     emailObject.content_subtype = "html"
     emailObject.send()
