@@ -85,3 +85,31 @@ class Alarm(models.Model):
     reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE, null=True)
     alarm_date = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+
+class ChatRoom(models.Model):
+    room_number = models.AutoField(primary_key=True)
+    starter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='started_chats')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_chats')
+    created_at = models.DateTimeField(auto_now_add=True)
+    latest_message_time = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'ChatRoom: {self.starter.username} and {self.receiver.username}'
+
+class ChatMessage(models.Model):
+    chatroom = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='authored_messages')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Message: {self.author.username} at {self.created_at}'
+
+    class Meta:
+        ordering = ['created_at']
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.chatroom.latest_message_time = self.created_at
+        self.chatroom.save()

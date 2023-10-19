@@ -40,8 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #앱 이름
+    'manda_project',
     'rest_framework',
-    'manda_app',#앱 이름
+    'manda_app'
 ]
 
 MIDDLEWARE = [
