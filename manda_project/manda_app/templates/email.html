@@ -11,7 +11,7 @@
 
 <body>
     <div class="mail_container" style="margin: 0 auto;
-        border: 1px solid #7269FF;
+        border: 1px solid #B2A8EE;
         display: block;
         flex-direction: column !important;
         justify-content: center;
@@ -21,12 +21,12 @@
         padding: 30px;">
         <h1 style="color: #7269FF;">웹법사와 함께 만드는 만다라트</h1>
         <div class="label">
-            <p style="margin: 20px 0px;">입력하신 비밀번호는 암호화 되어있어 임시로 생성된 비밀번호를 안내해 드립니다.</p>
+            <p style="margin: 30px 0px; color: #251F4B;">
+                기재된 임시 비밀번호로 로그인 하신 후 <br>
+                비밀번호를 변경해 주시기 바랍니다.
+            </p>
         </div>
-        <div class="output" style="font-weight: bolder; margin: 20px 0px;">임시 비밀번호 : {{ message }}</div>
-        <div class="label">
-            <p style="margin-bottom: 30px 0px;">안내해 드리는 비밀번호로 로그인 하시기 바랍니다.</p>
-        </div>
+        <div class="output" style="color: #251F4B; font-weight: bolder; margin: 20px 0px;">임시 비밀번호 : {{ message }}</div>
         <div class="loginBtn" style="display: block;
         text-align: center;
         align-items: center;
@@ -37,7 +37,7 @@
         
             background-color: #7269FF;
             padding: 15px 40px 15px 40px;
-            border-radius: 20px;" target="_blank">로그인하기</a>
+            border-radius: 10px;" target="_blank">로그인하기</a>
         </div>
     </div>
 </body>
