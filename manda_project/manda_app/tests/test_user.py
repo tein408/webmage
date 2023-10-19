@@ -90,28 +90,27 @@ class RegistrationAPITest(APITestCase):
 class UpdateUserAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.update_url = reverse('edit')
-        self.user_data = {
-            'username': 'testuser',
-            'email': 'test@example.com',
-            'password': 'testpassword'
-        }
         self.user = User.objects.create_user(
             username='testuser',
-            email='test@example.com',
             password='testpassword'
         )
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpassword')
+        self.update_url = reverse('edit')
 
-    def test_update_user_info(self):
-        updated_data = {
-            'username': 'updateduser',
-            'email': 'updated@example.com',
-        }
-        response = self.client.patch(self.update_url, updated_data, format='json')
+    def test_user_edit_with_password_change(self):
+        new_password = 'newpassword123'
+        response = self.client.patch(self.update_url, {'password': new_password}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], updated_data['username'])
-        self.assertEqual(response.data['email'], updated_data['email'])
+        
+        updated_user = User.objects.get(id=self.user.id)
+        self.assertTrue(updated_user.check_password(new_password))
+
+    def test_user_edit_without_password_change(self):
+        response = self.client.patch(self.update_url, {'username': 'newusername'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        unchanged_user = User.objects.get(id=self.user.id)
+        self.assertTrue(unchanged_user.check_password('testpassword'))
 
     def test_invalid_user_edit(self):
         data = {'username': '', 'email': '', 'password': 'testpassword'}
