@@ -51,20 +51,19 @@ def user_edit(request):
 
 @api_view(['POST'])
 def reset_password(request):
-    if request.method == 'POST':
-        email = request.data.get('email')
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({'error': 'User with this email address does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+    email = request.data.get('email')
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({'error': 'User with this email address does not exist.'}, status=status.HTTP_404_NOT_FOUND)
 
-        temp_password = generate_temp_password()
-        user.set_password(temp_password)
-        user.save()
+    temp_password = generate_temp_password()
+    user.set_password(temp_password)
+    user.save()
 
-        send_temp_password_email(user, temp_password)
+    send_temp_password_email(user, temp_password)
 
-        return Response({'message': 'Temporary password has been sent to your email address.'}, status=status.HTTP_200_OK)
+    return Response({'message': 'Temporary password has been sent to your email address.'}, status=status.HTTP_200_OK)
     
 @login_required
 @api_view(['DELETE'])
