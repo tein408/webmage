@@ -67,6 +67,7 @@ def reset_password(request):
         return Response({'message': 'Temporary password has been sent to your email address.'}, status=status.HTTP_200_OK)
     
 @login_required
+@api_view(['DELETE'])
 def delete_user(request):
     user = request.user
     user.delete()
