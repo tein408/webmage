@@ -1,19 +1,29 @@
 from rest_framework import status
+from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from ..serializers.user_serializer import UserSerializer
+from ..serializers.user_serializer import UserSerializer, UserAuthenticationSerializer
 from .utils import generate_temp_password, send_temp_password_email
 
+from drf_yasg.utils import swagger_auto_schema
+
+@api_view(['GET'])
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrf_token': csrf_token})
+
+@swagger_auto_schema(method='post', request_body=UserAuthenticationSerializer)
 @api_view(['POST'])
 def user_login(request):
-    data = JSONParser().parse(request)
+    data = request.data
     try:
         username = data['username']
         password = data['password']
@@ -31,10 +41,13 @@ def user_logout(requet):
     logout(requet)
     return HttpResponse(status=200)
 
+@swagger_auto_schema(method='post', request_body=UserSerializer)
 @api_view(['POST'])
 def sign_up(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
+        password = make_password(serializer.validated_data['password'])
+        serializer.validated_data['password'] = password
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -45,13 +58,16 @@ def user_edit(request):
     user = request.user
     serializer = UserSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
+        password = make_password(serializer.validated_data['password'])
+        serializer.validated_data['password'] = password
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='post', request_body=UserSerializer)
 @api_view(['POST'])
 def reset_password(request):
-    email = request.data.get('email')
+    email = request.data['email']
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
