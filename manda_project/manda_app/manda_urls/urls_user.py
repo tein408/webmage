@@ -9,4 +9,5 @@ urlpatterns = [
     path('edit/', views_users.user_edit, name='edit'),
     path('reset-password/', views_users.reset_password, name='reset_password'),
     path('delete-user/', views_users.delete_user, name='delete_user'),
+    path('get_token/', views_users.get_csrf_token, name='get_token'),
 ]
