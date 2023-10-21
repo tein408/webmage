@@ -4,7 +4,7 @@ WORKDIR /app/
 
 COPY requirements.txt /app/
 
-COPY manage.py /app/
+COPY . /app/
 
 RUN python -m venv myvenv && . myvenv/bin/activate && pip install -r requirements.txt
 
