@@ -233,3 +233,34 @@ class MandaMainListViewTest(APITestCase):
 
         self.assertEqual(response.data, expected_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+class OthersMandaMainListTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
+
+        self.other_user = User.objects.create_user(username='otheruser', password='otherpassword')
+        self.other_manda_main = MandaMain.objects.create(user=self.other_user, success=False, main_title='Other Main')
+        self.other_manda_main = MandaMain.objects.create(user=self.other_user, success=False, main_title='Other Main2')
+
+        self.url = reverse('others')
+
+    def test_others_manda_main_list(self):
+        response = self.client.get(self.url) 
+
+        user_id = self.other_user.id
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(user_id, response.data)
+        self.assertIsInstance(response.data[user_id], list)
+        self.assertEqual(len(response.data[user_id]), 2) 
+        manda_main_entry = response.data[user_id][0]
+        self.assertIn('id', manda_main_entry)
+        self.assertIn('success', manda_main_entry)
+        self.assertIn('main_title', manda_main_entry)
+        self.assertIn('subs', manda_main_entry)
+        self.assertIsInstance(manda_main_entry['subs'], list)
+        self.assertEqual(len(manda_main_entry['subs']), 8)  
+        manda_sub_entry = manda_main_entry['subs'][0]
+        self.assertIn('id', manda_sub_entry)
+        self.assertIn('success', manda_sub_entry)
+        self.assertIn('sub_title', manda_sub_entry)
