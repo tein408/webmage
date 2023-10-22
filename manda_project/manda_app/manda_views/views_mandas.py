@@ -1,11 +1,12 @@
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from ..models import MandaMain, MandaSub, MandaContent
-from ..serializers.manda_serializer import MandaMainSerializer, MandaSubUpdateSerializer, manda_sub_update_schema
+from ..serializers.manda_serializer import *
 import json
 
 from drf_yasg.utils import swagger_auto_schema
@@ -68,3 +69,44 @@ def update_manda_subs(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='delete',
+    manual_parameters=[
+        openapi.Parameter('manda_id', openapi.IN_PATH, description='Manda ID', type=openapi.TYPE_INTEGER),
+    ]
+)
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def manda_main_delete(request, manda_id):
+    user = request.user
+    manda_main = get_object_or_404(MandaMain, id=manda_id, user=user)
+    manda_main.delete()
+    return Response({'message': 'MandaMain deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+@swagger_auto_schema(
+    method='get',
+    manual_parameters=[
+        openapi.Parameter('manda_id', openapi.IN_PATH, description='Manda ID', type=openapi.TYPE_INTEGER),
+    ]
+)
+@api_view(['GET'])
+def manda_main_list(request, manda_id):
+    user = request.user
+
+    manda_main = MandaMain.objects.get(id=manda_id)
+    manda_main_serializer = MandaMainViewSerializer(manda_main)
+    
+    manda_sub_objects = MandaSub.objects.filter(main_id=manda_main)
+    manda_sub_serializer = MandaSubSerializer(manda_sub_objects, many=True)
+
+    manda_content_objects = MandaContent.objects.filter(sub_id__in=manda_sub_objects)
+    manda_content_serializer = MandaContentSerializer(manda_content_objects, many=True)
+
+    response_data = {
+        'main': manda_main_serializer.data,
+        'subs': manda_sub_serializer.data,
+        'contents': manda_content_serializer.data
+    }
+
+    return JsonResponse(response_data, status=status.HTTP_200_OK)
