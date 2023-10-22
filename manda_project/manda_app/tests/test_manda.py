@@ -191,11 +191,11 @@ class MandaMainDeleteTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(MandaMain.objects.filter(id=self.manda_main.id).exists())
 
-class MandaMainListViewTest(TestCase):
+class MandaMainViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(username='testuser', password='testpassword')
-        self.client.force_authenticate(user=self.user)
+        self.client.login(username='testuser', password='testpassword')
         self.manda_main = MandaMain.objects.create(user=self.user, success=False, main_title='Test Main Title')
         self.url = reverse('mandamain', args=[self.manda_main.id])
 
@@ -217,3 +217,19 @@ class MandaMainListViewTest(TestCase):
         self.assertEqual(response.data['main'], expected_data['main'])
         self.assertEqual(len(response.data['subs']), 8)
         self.assertEqual(len(response.data['contents']), 64)
+
+class MandaMainListViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
+        MandaMain.objects.create(user=self.user, success=False, main_title='Test Main Title 1')
+        MandaMain.objects.create(user=self.user, success=True, main_title='Test Main Title 2')
+        self.url = reverse('mymanda')
+
+    def test_manda_main_list_view(self):
+        response = self.client.get(self.url)
+
+        expected_data = MandaMainSerializer(MandaMain.objects.all(), many=True).data
+
+        self.assertEqual(response.data, expected_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
