@@ -109,4 +109,4 @@ def manda_main_list(request, manda_id):
         'contents': manda_content_serializer.data
     }
 
-    return JsonResponse(response_data, status=status.HTTP_200_OK)
+    return Response(response_data, status=status.HTTP_200_OK)
