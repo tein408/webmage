@@ -1,10 +1,11 @@
+from collections import OrderedDict
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 from rest_framework import status
 from ..models import MandaMain, MandaSub, MandaContent
-from ..serializers.manda_serializer import MandaMainSerializer, MandaSubUpdateSerializer
+from ..serializers.manda_serializer import *
 from django.urls import reverse
 import json
 
@@ -123,7 +124,7 @@ class UpdateMandaSubsTest(APITestCase):
             {"id": self.manda_subs[6].id, "sub_title": "New Sub 7"},
         ]
         data = {"subs": updated_values}
-        
+
         response = self.client.post(self.url, data=json.dumps(data), content_type='application/json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -166,3 +167,53 @@ class UpdateMandaSubsTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn('MandaSub with ID 999 does not exist for the current user.', response.data)
+
+class MandaMainDeleteTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client = APIClient()
+        self.client.login(username='testuser', password='testpassword')
+        self.manda_main = MandaMain.objects.create(user=self.user, success=True, main_title='Test MandaMain')
+        self.url = reverse('delete_manda', args=[self.manda_main.id])
+
+    def test_manda_main_delete(self):
+        response = self.client.delete(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(MandaMain.objects.filter(id=self.manda_main.id).exists())
+
+    def test_manda_main_delete_unauthorized(self):
+        unauthorized_user = User.objects.create_user(username='unauthorized', password='unauthorizedpassword')
+        self.client.login(username='unauthorized', password='unauthorizedpassword')
+
+        response = self.client.delete(self.url)
+        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(MandaMain.objects.filter(id=self.manda_main.id).exists())
+
+class MandaMainListViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=self.user)
+        self.manda_main = MandaMain.objects.create(user=self.user, success=False, main_title='Test Main Title')
+        self.url = reverse('mandamains', args=[self.manda_main.id])
+
+    def test_manda_main_list_view(self):
+        response = self.client.get(self.url)
+        
+        expected_data = {
+            'main': {
+                'id': self.manda_main.id,
+                'user': self.user.id,
+                'success': False,
+                'main_title': 'Test Main Title'
+            },
+            'subs': [],
+            'contents': []
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['main'], expected_data['main'])
+        self.assertEqual(len(response.data['subs']), 8)
+        self.assertEqual(len(response.data['contents']), 64)
