@@ -117,3 +117,36 @@ def manda_main_list(request):
     manda_main_objects = MandaMain.objects.filter(user=user)
     serializer = MandaMainSerializer(manda_main_objects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def others_manda_main_list(request):
+    user = request.user
+
+    manda_main = MandaMain.objects.exclude(user=user)
+    manda_data = {}
+    
+    for main in manda_main:
+        main_entry = {
+            'id': main.id,
+            'success': main.success,
+            'main_title': main.main_title,
+            'subs': []
+        }
+        
+        manda_subs = MandaSub.objects.filter(main_id=main)
+        for sub in manda_subs:
+            sub_entry = {
+                'id': sub.id,
+                'success': sub.success,
+                'sub_title': sub.sub_title
+            }
+            main_entry['subs'].append(sub_entry)
+
+        user_id = main.user.id
+        if user_id in manda_data:
+            manda_data[user_id].append(main_entry)
+        else:
+            manda_data[user_id] = [main_entry]
+
+    return Response(manda_data, status=status.HTTP_200_OK)
