@@ -91,7 +91,7 @@ def manda_main_delete(request, manda_id):
     ]
 )
 @api_view(['GET'])
-def manda_main_list(request, manda_id):
+def select_mandalart(request, manda_id):
     user = request.user
 
     manda_main = MandaMain.objects.get(id=manda_id)

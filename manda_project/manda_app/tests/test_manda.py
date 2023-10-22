@@ -197,7 +197,7 @@ class MandaMainListViewTest(TestCase):
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.client.force_authenticate(user=self.user)
         self.manda_main = MandaMain.objects.create(user=self.user, success=False, main_title='Test Main Title')
-        self.url = reverse('mandamains', args=[self.manda_main.id])
+        self.url = reverse('mandamain', args=[self.manda_main.id])
 
     def test_manda_main_list_view(self):
         response = self.client.get(self.url)
