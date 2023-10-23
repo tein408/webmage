@@ -28,7 +28,7 @@ SECRET_KEY = secrets['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'manda_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': secrets['postgresql_name'],
+        'USER': secrets['postgresql_user'],
+        'PASSWORD': secrets['postgresql_pwd'],
+        'HOST': secrets['postgresql_host'],
+        'PORT': secrets['postgresql_port'],
     }
 }
 
