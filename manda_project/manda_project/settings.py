@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #앱 이름
-    'manda_project',
     'rest_framework',
     'manda_app'
 ]
