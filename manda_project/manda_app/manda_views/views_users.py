@@ -13,11 +13,7 @@ from ..serializers.user_serializer import UserSerializer, UserAuthenticationSeri
 from .utils import generate_temp_password, send_temp_password_email
 
 from drf_yasg.utils import swagger_auto_schema
-
-@api_view(['GET'])
-def get_csrf_token(request):
-    csrf_token = get_token(request)
-    return JsonResponse({'csrf_token': csrf_token})
+from drf_yasg import openapi
 
 @swagger_auto_schema(method='post', request_body=UserAuthenticationSerializer)
 @api_view(['POST'])
@@ -51,6 +47,7 @@ def sign_up(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='patch', request_body=UserSerializer)
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def user_edit(request):
@@ -64,7 +61,16 @@ def user_edit(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@swagger_auto_schema(method='post', request_body=UserSerializer)
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'email': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_EMAIL),
+        },
+        required=['username', 'email']
+    )
+)
 @api_view(['POST'])
 def reset_password(request):
     email = request.data['email']
