@@ -23,17 +23,30 @@ class Follow(models.Model):
 #핵심목표
 class MandaMain(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # 외래키로 User 모델 연결
-    success = models.BooleanField()  # 성공 여부 (True/False)
-    main_title = models.CharField(max_length=255)  # 메인 타이틀, 필요에 따라 길이 조절 가능
+    success = models.BooleanField(default=False)  # 성공 여부 (True/False)
+    main_title = models.CharField(max_length=100)  # 메인 타이틀, 필요에 따라 길이 조절 가능
 
     def __str__(self):
         return self.main_title
+    
+    def save(self, *args, **kwargs):
+        super(MandaMain, self).save(*args, **kwargs)
+
+        # MandaSub 객체 생성
+        for _ in range(8):
+            MandaSub.objects.create(main_id=self)
+
+        # MandaContent 객체 생성
+        sub_instances = MandaSub.objects.filter(main_id=self)
+        for sub_instance in sub_instances:
+            for _ in range(8):
+                MandaContent.objects.create(sub_id=sub_instance)
 
 #세부목표
 class MandaSub(models.Model):
     main_id = models.ForeignKey(MandaMain, on_delete=models.CASCADE)  # MandaMain 모델과 외래키로 연결
-    success = models.BooleanField()  # 성공 여부 (True/False)
-    sub_title = models.CharField(max_length=20)  # 서브 타이틀, 최대 길이 20
+    success = models.BooleanField(default=False)  # 성공 여부 (True/False)
+    sub_title = models.CharField(max_length=100, null=True)  # 서브 타이틀, 최대 길이 50
 
     def __str__(self):
         return self.sub_title
@@ -41,8 +54,8 @@ class MandaSub(models.Model):
 #실천목표
 class MandaContent(models.Model):
     sub_id = models.ForeignKey(MandaSub, on_delete=models.CASCADE)  # 외래키로 MandaSub와 연결
-    success_count = models.BigIntegerField()  # 성공 여부, bigint 타입
-    content = models.CharField(max_length=20)  # 콘텐츠, 최대 길이 20
+    success_count = models.BigIntegerField(default=0)  # 성공 여부, bigint 타입
+    content = models.CharField(max_length=100, null=True)  # 콘텐츠, 최대 길이 50
 
     def __str__(self):
         return self.content
