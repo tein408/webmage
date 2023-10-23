@@ -1,7 +1,7 @@
 from django.urls import path
-from ..views import write
+from ..manda_views import views_write
 
 
 urlpatterns = [
-     path('write/', write, name='write'),
+     #path('write/', views_write, name='write'),
 ]
