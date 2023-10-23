@@ -40,9 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #앱 이름
     'rest_framework',
     'drf_yasg',
-    'manda_app',#앱 이름
+    'manda_app', #앱 이름
 ]
 
 MIDDLEWARE = [
@@ -127,3 +128,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+#### SMTP setting ####
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.naver.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'webmage_manda@naver.com'
+EMAIL_HOST_PASSWORD = secrets['SMTP_PASSWORD']
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
