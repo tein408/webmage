@@ -28,12 +28,11 @@ router = routers.DefaultRouter()
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Statchung API",
+        title="Manda API",
         default_version='v1',
         description="Test description",
-        terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="contact@snippets.local"),
-        license=openapi.License(name="BSD License"),
+        # terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="Manda 웹법사 <webmage_manda@naver.com>"),
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
@@ -41,7 +40,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(('manda_app.urls', 'api'))),
     path('', include('manda_app.urls')),
 ]
 
