@@ -30,7 +30,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Manda API",
         default_version='v1',
-        description="Test description",
+        description="웹법사와 함께 만드는 만다라트 SNS",
         # terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="Manda 웹법사 <webmage_manda@naver.com>"),
     ),
