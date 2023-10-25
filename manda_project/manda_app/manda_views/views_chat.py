@@ -1,9 +1,13 @@
 from rest_framework import status
-from datetime import timezone
+from django.utils import timezone
 from ..models import ChatRoom, ChatMessage, UserProfile
 from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 def format_datetime(dt):
     today = timezone.now().date()
@@ -14,6 +18,7 @@ def format_datetime(dt):
         return dt.strftime("어제 %p %I:%M")
     return dt.strftime("%Y-%m-%d %p %I:%M")
 
+@api_view(['GET'])
 def get_rooms(request):
     chat_rooms = ChatRoom.objects.filter(Q(starter=request.user.id) | Q(receiver=request.user.id))
 
@@ -22,12 +27,12 @@ def get_rooms(request):
     for room in chat_rooms:
         try:
             unread_message_count = ChatMessage.objects.filter(
-                Q(chat_room=room),
-                ~Q(receiver=request.user),
-                Q(read_or_not=False)
+                Q(chatroom=room),
+                ~Q(author=request.user),
+                Q(is_read=False)
             ).count()
 
-            latest_message = ChatMessage.objects.filter(chat_room=room).latest('created_at')
+            latest_message = ChatMessage.objects.filter(chatroom=room).latest('created_at')
             starter = None
 
             if latest_message.chatroom.starter == request.user:
@@ -38,7 +43,7 @@ def get_rooms(request):
             latest_messages.append({
                 'chat_room_id': room.pk,
                 'starter_id': starter.pk,
-                'starter': starter,
+                'starter': starter.username,
                 'message': latest_message.content,
                 'created_at': format_datetime(latest_message.created_at),
                 'unread_message_count': unread_message_count,
@@ -62,7 +67,7 @@ def get_rooms(request):
 
     latest_messages.sort(key=lambda x: x['created_at'], reverse=True)
 
-    return Response(latest_messages, status=status.HTTP_200_OK)
+    return Response({'rooms':latest_messages}, status=status.HTTP_200_OK)
 
 def chat_history(request, room_number, sender_id):
     current_chat = None
