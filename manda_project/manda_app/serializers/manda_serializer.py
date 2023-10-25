@@ -38,6 +38,15 @@ class MandaSubUpdateSerializer(serializers.Serializer):
         if len(value) > 50:
             raise serializers.ValidationError("세부 목표는 50글자 이하여야 합니다.")
         return value
+    
+class MandaContentUpdateSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    content = serializers.CharField()
+
+    def validate_content(self, value):
+        if len(value) > 50:
+            raise serializers.ValidationError("내용은 50글자 이하여야 합니다.")
+        return value
 
 manda_sub_update_schema = {
     "type": "array",
@@ -48,5 +57,17 @@ manda_sub_update_schema = {
             "sub_title": {"type": "string"}
         },
         "required": ["id", "sub_title"]
+    }
+}
+
+manda_content_update_schema = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {"type": "integer"},
+            "content": {"type": "string"}
+        },
+        "required": ["id", "content"]
     }
 }

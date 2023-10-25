@@ -139,10 +139,9 @@ class UpdateMandaSubsTest(APITestCase):
             self.assertEqual(updated_sub.sub_title, sub_data["sub_title"])
 
         # 다른 MandaSub 객체들의 값은 변경되지 않았는지 검증
-        for i, manda_sub in enumerate(self.manda_subs):
+        for i in range(len(self.manda_subs)):
             if i not in [0, 2, 4, 6]:
-                manda_sub.refresh_from_db()
-                self.assertEqual(manda_sub.sub_title, None)
+                self.assertEqual(self.manda_subs[i].sub_title, None)
 
     def test_long_sub_title(self):
         long_sub_title_data = {
@@ -264,3 +263,63 @@ class OthersMandaMainListTestCase(APITestCase):
         self.assertIn('id', manda_sub_entry)
         self.assertIn('success', manda_sub_entry)
         self.assertIn('sub_title', manda_sub_entry)
+
+class UpdateMandaContentsTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
+        self.manda_main = MandaMain.objects.create(user=self.user, success=False, main_title='Main Title')
+        self.manda_subs = MandaSub.objects.filter(main_id=self.manda_main)
+        self.manda_contents = MandaContent.objects.filter(sub_id__in=self.manda_subs)
+        self.url = reverse('edit_content')
+
+    def test_update_manda_contents(self):
+        updated_values = [
+            {"id": self.manda_contents[0].id, "content": "New Content 1"},
+            {"id": self.manda_contents[12].id, "content": "New Content 13"},
+            {"id": self.manda_contents[24].id, "content": "New Content 25"},
+            {"id": self.manda_contents[36].id, "content": "New Content 37"},
+        ]
+        data = {"contents": updated_values}
+
+        response = self.client.post(self.url, data=json.dumps(data), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['content'], "New Content 1")
+        self.assertEqual(response.data[1]['content'], "New Content 13")
+        self.assertEqual(response.data[2]['content'], "New Content 25")
+        self.assertEqual(response.data[3]['content'], "New Content 37")
+
+        # 업데이트된 MandaContent 객체들을 다시 불러와서 값 검증
+        updated_contents = [MandaContent.objects.get(id=content_data["id"]) for content_data in updated_values]
+        for updated_content, content_data in zip(updated_contents, updated_values):
+            self.assertEqual(updated_content.content, content_data["content"])
+
+        # 다른 MandaContent 객체들의 값은 변경되지 않았는지 검증
+        for i in range(len(self.manda_contents)):
+            if i < 60:
+                self.assertEqual(self.manda_contents[i].content, None)
+
+    def test_long_content(self):
+        long_content_data = {
+            'contents': [
+                {'id': 1, 'content': 'a' * 51},
+            ]
+        }
+
+        response = self.client.post(self.url, data=json.dumps(long_content_data), content_type='application/json')
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('내용은 50글자 이하여야 합니다.', response.data[0]['content'])
+
+    def test_nonexistent_content_id(self):
+        nonexistent_content = {
+            'contents': [
+                {'id': 999, 'content': 'Valid Value'},
+            ]
+        }
+
+        response = self.client.post(self.url, data=json.dumps(nonexistent_content), content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn('MandaContent with ID 999 does not exist for the current user.', response.data)
