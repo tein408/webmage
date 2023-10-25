@@ -4,7 +4,7 @@ from ..models import MandaMain, MandaSub, MandaContent
 class MandaMainSerializer(serializers.ModelSerializer):
     class Meta:
         model = MandaMain
-        fields = ('id', 'user', 'main_title')
+        fields = ('id', 'user', 'main_title', 'success')
 
     def validate_main_title(self, value):
         if len(value) > 30:
@@ -42,6 +42,7 @@ class MandaSubUpdateSerializer(serializers.Serializer):
 class MandaContentUpdateSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     content = serializers.CharField()
+    success_count = serializers.IntegerField()
 
     def validate_content(self, value):
         if len(value) > 50:
@@ -54,9 +55,10 @@ manda_sub_update_schema = {
         "type": "object",
         "properties": {
             "id": {"type": "integer"},
-            "sub_title": {"type": "string"}
+            "sub_title": {"type": "string"},
+            "success": {"type": "boolean"}
         },
-        "required": ["id", "sub_title"]
+        "required": ["id", "sub_title", "success"]
     }
 }
 
@@ -66,8 +68,9 @@ manda_content_update_schema = {
         "type": "object",
         "properties": {
             "id": {"type": "integer"},
-            "content": {"type": "string"}
+            "content": {"type": "string"},
+            "success_count": {"type": "integer"}
         },
-        "required": ["id", "content"]
+        "required": ["id", "content", "success_count"]
     }
 }
