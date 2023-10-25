@@ -69,17 +69,18 @@ def get_rooms(request):
 
     return Response({'rooms':latest_messages}, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
 def chat_history(request, room_number, sender_id):
     current_chat = None
     formatted_chat_msgs = []
     first_unread_index = -1
 
-    current_room = ChatRoom.objects.get(id=room_number)
-    current_chat = ChatMessage.objects.filter(chat_room=current_room).order_by('created_at')     
+    current_room = ChatRoom.objects.get(pk=room_number)
+    current_chat = ChatMessage.objects.filter(chatroom=current_room).order_by('created_at')
 
     for chat in current_chat:
         if chat.is_read == False:
-            if chat.author.id != request.user.id:
+            if chat.author.pk != request.user.id:
                 chat.is_read = True
                 chat.save()
                 if first_unread_index == -1:
@@ -94,12 +95,11 @@ def chat_history(request, room_number, sender_id):
             'id': chat.pk,
         })
 
-    sender_name = User.objects.get(id=sender_id).username
+    sender_name = User.objects.get(pk=sender_id).username
 
     context = {
         "room_number" : room_number,
         "chat_msgs" : formatted_chat_msgs,
-        "latest_messages" : get_rooms(request),
         'first_unread_index': first_unread_index,
         'sender': sender_name
     }
