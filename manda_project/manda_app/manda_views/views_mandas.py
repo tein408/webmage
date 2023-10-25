@@ -21,7 +21,20 @@ def manda_main_create(request):
 
     if serializer.is_valid():
         serializer.save(user=user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        manda_sub_objects = MandaSub.objects.filter(main_id=serializer.data['id'])
+        manda_sub_serializer = MandaSubSerializer(manda_sub_objects, many=True)
+
+        manda_content_objects = MandaContent.objects.filter(sub_id__in=manda_sub_objects)
+        manda_content_serializer = MandaContentSerializer(manda_content_objects, many=True)
+
+        response_data = {
+            'main': serializer.data,
+            'subs': manda_sub_serializer.data,
+            'contents': manda_content_serializer.data
+        }
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -65,6 +78,41 @@ def update_manda_subs(request):
 
             manda_sub.sub_title = new_value
             manda_sub.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "contents": manda_content_update_schema
+        },
+        required=["contents"]
+    )
+)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_manda_contents(request):
+    user = request.user
+    data = request.data
+
+    serializer = MandaContentUpdateSerializer(data=data.get('contents', []), many=True)
+
+    if serializer.is_valid():
+        for content_data in serializer.validated_data:
+            content_id = content_data.get('id')
+            new_value = content_data.get('content')
+
+            try:
+                manda_content = MandaContent.objects.get(id=content_id, sub_id__main_id__user=user)
+            except MandaContent.DoesNotExist:
+                return Response(f"MandaContent with ID {content_id} does not exist for the current user.", status=status.HTTP_404_NOT_FOUND)
+
+            manda_content.content = new_value
+            manda_content.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
