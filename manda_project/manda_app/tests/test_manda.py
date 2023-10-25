@@ -28,7 +28,7 @@ class MandaMainCreateTest(TestCase):
         self.assertTrue(MandaMain.objects.filter(user=self.user, main_title='Test Main Title').exists())
         created_object = MandaMain.objects.get(user=self.user, main_title='Test Main Title')
         expected_data = MandaMainSerializer(created_object).data
-        self.assertEqual(response.data, expected_data)
+        self.assertEqual(response.data['main'], expected_data)
 
     def test_manda_main_create_with_sub_and_content(self):
         data = {
@@ -138,6 +138,8 @@ class UpdateMandaSubsTest(APITestCase):
         for updated_sub, sub_data in zip(updated_subs, updated_values):
             self.assertEqual(updated_sub.sub_title, sub_data["sub_title"])
 
+
+        print(self.manda_subs)
         # 다른 MandaSub 객체들의 값은 변경되지 않았는지 검증
         for i in range(len(self.manda_subs)):
             if i not in [0, 2, 4, 6]:
