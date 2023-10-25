@@ -138,11 +138,9 @@ class UpdateMandaSubsTest(APITestCase):
         for updated_sub, sub_data in zip(updated_subs, updated_values):
             self.assertEqual(updated_sub.sub_title, sub_data["sub_title"])
 
-
-        print(self.manda_subs)
         # 다른 MandaSub 객체들의 값은 변경되지 않았는지 검증
         for i in range(len(self.manda_subs)):
-            if i not in [0, 2, 4, 6]:
+            if i < 4:
                 self.assertEqual(self.manda_subs[i].sub_title, None)
 
     def test_long_sub_title(self):
