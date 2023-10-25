@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 from ..models import ChatRoom, ChatMessage, UserProfile
+from ..manda_views import views_chat
 
 class GetRoomsTestCase(TestCase):
     def setUp(self):
@@ -44,3 +45,41 @@ class GetRoomsTestCase(TestCase):
         self.assertEqual(second_room_data['message'], 'Hi')
         self.assertEqual(second_room_data['unread_message_count'], 1)
 
+class ChatHistoryTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.sender = User.objects.create_user(username='sender', password='senderpassword')
+        self.client = APIClient()
+        self.client.login(username='testuser', password='testpassword')
+        self.chat_room = ChatRoom.objects.create(starter=self.user)
+        self.chat_message1 = ChatMessage.objects.create(chatroom=self.chat_room, content='Hello', author=self.user, is_read=False)
+        self.chat_message2 = ChatMessage.objects.create(chatroom=self.chat_room, content='Hi', author=self.sender, is_read=False)
+        self.url = reverse('current', args=[self.chat_room.pk, self.sender.pk])
+
+    def test_chat_history(self):
+        response = self.client.get(self.url)
+
+        expected_data = {
+            "room_number": self.chat_room.pk,
+            "chat_msgs": [
+                {
+                    'created_at': views_chat.format_datetime(self.chat_message1.created_at),
+                    'message': 'Hello',
+                    'username': self.user.username,
+                    'is_read': False,
+                    'id': self.chat_message1.pk,
+                },
+                {
+                    'created_at': views_chat.format_datetime(self.chat_message1.created_at),
+                    'message': 'Hi',
+                    'username': self.sender.username,
+                    'is_read': True,
+                    'id': self.chat_message2.pk,
+                }
+            ],
+            'first_unread_index': 2,
+            'sender': self.sender.username
+        }
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_data)
