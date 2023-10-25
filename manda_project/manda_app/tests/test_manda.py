@@ -140,7 +140,7 @@ class UpdateMandaSubsTest(APITestCase):
 
         # 다른 MandaSub 객체들의 값은 변경되지 않았는지 검증
         for i in range(len(self.manda_subs)):
-            if i < 4:
+            if i not in [0, 2, 4, 6]:
                 self.assertEqual(self.manda_subs[i].sub_title, None)
 
     def test_long_sub_title(self):
