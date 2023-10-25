@@ -102,7 +102,7 @@ class Alarm(models.Model):
 class ChatRoom(models.Model):
     room_number = models.AutoField(primary_key=True)
     starter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='started_chats')
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_chats')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_chats', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     latest_message_time = models.DateTimeField(null=True, blank=True)
 
