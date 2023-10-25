@@ -34,16 +34,20 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #앱 이름
+
     'rest_framework',
     'drf_yasg',
     'manda_app', #앱 이름
+    'channels',
+    'channels_redis'
+
 ]
 
 MIDDLEWARE = [
@@ -142,3 +146,17 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'webmage_manda@naver.com'
 EMAIL_HOST_PASSWORD = secrets['SMTP_PASSWORD']
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+## 프로젝트명.asgi.application
+ASGI_APPLICATION = "manda_project.asgi.application"
+
+## 채널 - redis 연결 설정
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
