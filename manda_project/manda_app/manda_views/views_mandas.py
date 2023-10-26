@@ -56,6 +56,9 @@ def update_manda_main(request):
     user = request.user
     serializer = MandaMainSerializer(data=request.data, partial=True)
 
+    if 'id' not in request.data:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
     if serializer.is_valid():
         if 'main_title' in request.data:
             main_id = request.data['id']
@@ -147,7 +150,6 @@ def update_manda_contents(request):
         for content_data in serializer.validated_data:
             content_id = content_data.get('id')
             new_value = content_data.get('content')
-            print(content_data)
 
             try:
                 manda_content = MandaContent.objects.get(id=content_id, sub_id__main_id__user=user)
