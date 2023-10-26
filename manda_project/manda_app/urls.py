@@ -8,6 +8,7 @@ from manda_app.views import TestView
 from .manda_urls.urls_user import urlpatterns as manda_user_urls
 from .manda_urls.urls_write import urlpatterns as manda_write_urls
 from .manda_urls.urls_manda import urlpatterns as manda_manda_urls
+from .manda_urls.urls_chat import urlpatterns as manda_chat_urls
 
 urlpatterns = [
     path('v1/test/', TestView.as_view(), name='test'),
@@ -15,5 +16,6 @@ urlpatterns = [
     path('user/', include(manda_user_urls)), #회원가입, 로그인, 로그아웃
     path('write/', include(manda_write_urls)), #글 작성, 글 선택
     path('manda/', include(manda_manda_urls)), #만다라트
+    path('chat/', include(manda_chat_urls)), #채팅
     path('get_token/', views.get_csrf_token, name='get_token'), #토큰
 ]
