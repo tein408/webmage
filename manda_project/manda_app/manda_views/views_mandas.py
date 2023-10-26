@@ -38,6 +38,47 @@ def manda_main_create(request):
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(
+    method='patch',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "user": {"type": "integer"},
+            "id": {"type": "integer"},
+            "main_title": {"type": "string"},
+            "success": {"type": "boolean"}
+        }
+    )
+)
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_manda_main(request):
+    user = request.user
+    serializer = MandaMainSerializer(data=request.data, partial=True)
+
+    if 'id' not in request.data:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    if serializer.is_valid():
+        if 'main_title' in request.data:
+            main_id = request.data['id']
+            main_title = serializer.validated_data['main_title']
+
+            try:
+                manda_main = MandaMain.objects.get(pk=main_id, user=user)
+            except MandaMain.DoesNotExist:
+                return Response(f"MandaMain with ID {main_id} does not exist for the current user.", status=status.HTTP_404_NOT_FOUND)
+
+            if 'success' in request.data:
+                new_success = request.data.get('success')
+                manda_main.success = new_success
+
+            manda_main.main_title = main_title
+            manda_main.save()
+            
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 """
 {
   "subs": [
@@ -75,6 +116,10 @@ def update_manda_subs(request):
                 manda_sub = MandaSub.objects.get(id=sub_id, main_id__user=user)
             except MandaSub.DoesNotExist:
                 return Response(f"MandaSub with ID {sub_id} does not exist for the current user.", status=status.HTTP_404_NOT_FOUND)
+            
+            if 'success' in sub_data:
+                new_success = sub_data.get('success')
+                manda_sub.success = new_success
 
             manda_sub.sub_title = new_value
             manda_sub.save()
@@ -111,6 +156,10 @@ def update_manda_contents(request):
             except MandaContent.DoesNotExist:
                 return Response(f"MandaContent with ID {content_id} does not exist for the current user.", status=status.HTTP_404_NOT_FOUND)
 
+            if 'success_count' in content_data:
+                new_success_count = content_data.get('success_count')
+                manda_content.success_count = new_success_count
+
             manda_content.content = new_value
             manda_content.save()
 
@@ -140,8 +189,6 @@ def manda_main_delete(request, manda_id):
 )
 @api_view(['GET'])
 def select_mandalart(request, manda_id):
-    user = request.user
-
     manda_main = MandaMain.objects.get(id=manda_id)
     manda_main_serializer = MandaMainViewSerializer(manda_main)
     
