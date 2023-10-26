@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'manda_app', #앱 이름
     'channels',
-    'channels_redis'
-
+    'channels_redis',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +58,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'manda_project.urls'
@@ -160,3 +162,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# CORS 세팅 추가
+CORS_ALLOW_ALL_ORIGINS = True
