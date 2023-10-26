@@ -323,3 +323,70 @@ class UpdateMandaContentsTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn('MandaContent with ID 999 does not exist for the current user.', response.data)
+
+class UpdateMandaMainTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
+        self.manda_main = MandaMain.objects.create(user=self.user, main_title='Original Title')
+        self.url = reverse('edit_main')
+
+    def test_update_manda_main(self):
+        manda_main = MandaMain.objects.create(user=self.user, main_title='Original Title')
+        data = {
+            'id': manda_main.id,
+            'main_title': 'Updated Title'
+        }
+
+        response = self.client.patch(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['main_title'], 'Updated Title')
+        manda_main.refresh_from_db()
+        self.assertEqual(manda_main.main_title, 'Updated Title')
+
+    def test_update_manda_main_invalid_id(self):
+        data = {
+            'id': 9999,
+            'main_title': 'Updated Title'
+        }
+
+        response = self.client.patch(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, "MandaMain with ID 9999 does not exist for the current user.")
+
+    def test_update_manda_main_missing_id(self):
+        data = {
+            'main_title': 'Updated Title'
+        }
+
+        response = self.client.patch(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('id', response.data) 
+
+    def test_update_manda_main_invalid_data(self):
+        invalid_data = {
+            'user': self.user.id,
+            'id': self.manda_main.pk,
+            'main_title': '',
+        }
+
+        response = self.client.patch(self.url, invalid_data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.manda_main.refresh_from_db()
+        self.assertNotEqual(self.manda_main.main_title, invalid_data['main_title'])
+
+    def test_update_manda_main_too_long_title(self):
+        invalid_data = {
+            'user': self.user.id,
+            'id': self.manda_main.pk,
+            'main_title': 'a' * 51,
+        }
+
+        response = self.client.patch(self.url, invalid_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.manda_main.refresh_from_db()
+        self.assertIn('main_title', response.data)
