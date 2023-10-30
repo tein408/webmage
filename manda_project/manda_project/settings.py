@@ -37,6 +37,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +48,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'manda_app', #앱 이름
+    'channels',
+    'channels_redis',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -60,6 +64,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'manda_project.urls'
@@ -149,7 +155,21 @@ EMAIL_HOST_USER = 'webmage_manda@naver.com'
 EMAIL_HOST_PASSWORD = secrets['SMTP_PASSWORD']
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+## 프로젝트명.asgi.application
+ASGI_APPLICATION = "manda_project.asgi.application"
+
+## 채널 - redis 연결 설정
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
 # CORS 세팅 추가
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
