@@ -28,7 +28,10 @@ SECRET_KEY = secrets['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'http://52.79.233.211/',
+    'http://localhost:8000',
+]
 
 
 # Application definition
@@ -172,3 +175,9 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-with',
 )
+
+# CORS white list
+CORS_ORIGIN_WHITELIST = [
+    'http://52.79.233.211/',
+    'http://localhost:8000',
+]
