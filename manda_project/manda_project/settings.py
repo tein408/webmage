@@ -28,7 +28,10 @@ SECRET_KEY = secrets['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'http://52.79.233.211/',
+    'http://localhost:8000',
+]
 
 
 # Application definition
@@ -51,6 +54,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # cors 설정은 최상단
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -122,11 +128,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -149,7 +155,6 @@ EMAIL_HOST_USER = 'webmage_manda@naver.com'
 EMAIL_HOST_PASSWORD = secrets['SMTP_PASSWORD']
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-
 ## 프로젝트명.asgi.application
 ASGI_APPLICATION = "manda_project.asgi.application"
 
@@ -165,3 +170,34 @@ CHANNEL_LAYERS = {
 
 # CORS 세팅 추가
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+# CORS 허용 메서드 추가
+CORS_ALLOW_METHODS = ( 
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+# CORS 허용 헤더 추가
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
+# CORS white list
+CORS_ORIGIN_WHITELIST = [
+    'http://52.79.233.211/',
+    'http://localhost:8000',
+]
