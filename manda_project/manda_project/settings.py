@@ -29,7 +29,7 @@ SECRET_KEY = secrets['SECRET_KEY']
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'http://52.79.233.211/',
+    'http://52.79.233.211',
     'http://localhost:8000',
 ]
 
@@ -198,6 +198,6 @@ CORS_ALLOW_HEADERS = (
 
 # CORS white list
 CORS_ORIGIN_WHITELIST = [
-    'http://52.79.233.211/',
+    'http://52.79.233.211',
     'http://localhost:8000',
 ]
