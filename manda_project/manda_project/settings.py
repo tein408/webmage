@@ -204,3 +204,9 @@ CORS_ORIGIN_WHITELIST = [
     'http://116.33.55.44',
     'http://localhost:3000',
 ]
+
+# 외부 사이트에서의 요청에 대한 쿠키 전송 차단
+# Strict : 모두 차단, Lax : POST 요청에 대해 쿠키 전송 차단, None : 모든 요청에 대해 쿠키 전송
+# https에서만 전송하도록 설정하려면 SESSION(CSRF)_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None'
