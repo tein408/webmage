@@ -207,8 +207,11 @@ def select_mandalart(request, manda_id):
     return Response(response_data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def manda_main_list(request):
-    user = request.user
+def manda_main_list(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return Response(f"해당 유저가 존재하지 않습니다.", status=status.HTTP_404_NOT_FOUND)
     manda_main_objects = MandaMain.objects.filter(user=user)
     serializer = MandaMainSerializer(manda_main_objects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -245,3 +248,26 @@ def others_manda_main_list(request):
             manda_data[user_id] = [main_entry]
 
     return Response(manda_data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def manda_main_sub(request, manda_id):
+    manda_main = MandaMain.objects.get(pk=manda_id)
+    
+    main_entry = {
+        'id': manda_main.id,
+        'success': manda_main.success,
+        'main_title': manda_main.main_title,
+        'user_id': manda_main.user.id,
+        'subs': []
+    }
+    
+    manda_subs = MandaSub.objects.filter(main_id=manda_main)
+    for sub in manda_subs:
+        sub_entry = {
+            'id': sub.id,
+            'success': sub.success,
+            'sub_title': sub.sub_title
+        }
+        main_entry['subs'].append(sub_entry)
+
+    return Response(main_entry, status=status.HTTP_200_OK)
