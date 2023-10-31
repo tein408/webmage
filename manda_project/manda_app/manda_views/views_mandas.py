@@ -161,7 +161,10 @@ def select_mandalart(request, manda_id):
 
 @api_view(['GET'])
 def manda_main_list(request, user_id):
-    user = User.objects.get(pk=user_id)
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return Response(f"해당 유저가 존재하지 않습니다.", status=status.HTTP_404_NOT_FOUND)
     manda_main_objects = MandaMain.objects.filter(user=user)
     serializer = MandaMainSerializer(manda_main_objects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
