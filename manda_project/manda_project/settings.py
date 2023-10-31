@@ -201,5 +201,6 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'http://116.33.55.44:3000',
-    'http://116.33.55.44'
+    'http://116.33.55.44',
+    'http://localhost:3000',
 ]
