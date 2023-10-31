@@ -69,6 +69,13 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    # 다른 설정 ...
+}
+
 ROOT_URLCONF = 'manda_project.urls'
 
 TEMPLATES = [
