@@ -160,8 +160,8 @@ def select_mandalart(request, manda_id):
     return Response(response_data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def manda_main_list(request):
-    user = request.user
+def manda_main_list(request, user_id):
+    user = User.objects.get(pk=user_id)
     manda_main_objects = MandaMain.objects.filter(user=user)
     serializer = MandaMainSerializer(manda_main_objects, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
