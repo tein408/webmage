@@ -9,4 +9,5 @@ urlpatterns = [
     path('mandamain/<int:manda_id>', views_mandas.select_mandalart, name='mandamain'),
     path('<int:user_id>/', views_mandas.manda_main_list, name='usermanda'),
     path('others/', views_mandas.others_manda_main_list, name='others'),
+    path('mandasimple/<int:manda_id>', views_mandas.manda_main_sub, name='mandasimple'),
 ]
