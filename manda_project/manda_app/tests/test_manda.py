@@ -223,7 +223,7 @@ class MandaMainListViewTest(APITestCase):
         self.client.login(username='testuser', password='testpassword')
         MandaMain.objects.create(user=self.user, success=False, main_title='Test Main Title 1')
         MandaMain.objects.create(user=self.user, success=True, main_title='Test Main Title 2')
-        self.url = reverse('mymanda')
+        self.url = reverse('usermanda')
 
     def test_manda_main_list_view(self):
         response = self.client.get(self.url)
