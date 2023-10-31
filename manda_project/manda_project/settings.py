@@ -45,11 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
     'drf_yasg',
     'manda_app', #앱 이름
     'channels',
     'channels_redis',
     'corsheaders',
+    'psycopg2'
 ]
 
 MIDDLEWARE = [
