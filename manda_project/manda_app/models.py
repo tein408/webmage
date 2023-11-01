@@ -3,17 +3,16 @@ from django.contrib.auth.models import User  # User 모델을 가져오기
 from django.http import JsonResponse #
 from django.db.models import JSONField
 
-
 # Create your models here.
 
 #User 테이블
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile') 
     user_image = models.CharField(max_length=255, verbose_name="유저 프로필 이미지")
-    user_position = models.CharField(max_length=255, verbose_name="유저가 속한 그룹")
-    user_info = models.CharField(max_length=255, verbose_name="유저가 작성한 프로필 설명")
-    user_hash = models.CharField(max_length=255, verbose_name="해시태그")
-    success_count = models.IntegerField(verbose_name="만다라트 실천 횟수")
+    user_position = models.CharField(max_length=255, verbose_name="유저가 속한 그룹", null=True)
+    user_info = models.CharField(max_length=255, verbose_name="유저가 작성한 프로필 설명", null=True)
+    user_hash = models.CharField(max_length=255, verbose_name="해시태그", null=True)
+    success_count = models.IntegerField(verbose_name="만다라트 실천 횟수", default=0)
 
 #Follow 테이블
 class Follow(models.Model):
@@ -26,6 +25,9 @@ class MandaMain(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # 외래키로 User 모델 연결
     success = models.BooleanField(default=False)  # 성공 여부 (True/False)
     main_title = models.CharField(max_length=100)  # 메인 타이틀, 필요에 따라 길이 조절 가능
+
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return self.main_title
@@ -49,6 +51,9 @@ class MandaSub(models.Model):
     success = models.BooleanField(default=False)  # 성공 여부 (True/False)
     sub_title = models.CharField(max_length=100, null=True)  # 서브 타이틀, 최대 길이 50
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
         return self.sub_title
 
@@ -58,6 +63,9 @@ class MandaContent(models.Model):
     success_count = models.BigIntegerField(default=0)  # 성공 여부, bigint 타입
     content = models.CharField(max_length=100, null=True)  # 콘텐츠, 최대 길이 50
 
+    class Meta:
+        ordering = ['id']
+        
     def __str__(self):
         return self.content
     
@@ -72,6 +80,7 @@ class Feed(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # 피드 생성일
     updated_at = models.DateTimeField(auto_now=True)  # 피드 업데이트일
     feed_hash = models.CharField(max_length=255)  # 피드 해시값, 필요에 따라 길이 조절 가능
+    emoji_count = JSONField(blank=True, null=True, default=dict)
 
     def __str__(self):
         return self.feed_contents
@@ -103,7 +112,7 @@ class Alarm(models.Model):
 class ChatRoom(models.Model):
     room_number = models.AutoField(primary_key=True)
     starter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='started_chats')
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_chats')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_chats', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     latest_message_time = models.DateTimeField(null=True, blank=True)
 
