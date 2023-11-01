@@ -30,6 +30,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     user_position = serializers.CharField(validators=[validate_max_length])
     user_info = serializers.CharField(validators=[validate_max_length2])
     user_hash = serializers.CharField(validators=[validate_max_length])
+    success_count = serializers.IntegerField()
 
     class Meta:
         model = UserProfile
