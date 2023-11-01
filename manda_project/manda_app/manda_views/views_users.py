@@ -9,9 +9,9 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authtoken.models import Token
-from ..serializers.user_serializer import UserSerializer, UserAuthenticationSerializer
+from ..serializers.user_serializer import UserSerializer, UserAuthenticationSerializer, UserProfileSerializer
 from .utils import generate_temp_password, send_temp_password_email
+from ..models import UserProfile
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -95,3 +95,36 @@ def delete_user(request):
     user = request.user
     user.delete()
     return JsonResponse({'message': 'User deleted successfully.'})
+
+@swagger_auto_schema(method='post', request_body=UserProfileSerializer)
+@api_view(['POST'])
+def write_profile(request):
+    serializer = UserProfileSerializer(data=request.data)
+    if serializer.is_valid():
+        image_file = request.data.get('user_img')
+        user_profile = UserProfile.objects.create(
+            user=request.user,
+            image=image_file,
+            user_position=serializer.validated_data.get('user_position'),
+            user_info=serializer.validated_data.get('user_info'),
+            user_hash=serializer.validated_data.get('user_hash'),
+            success_count=serializer.validated_data.get('success_count')
+        )
+        response_serializer = UserProfileSerializer(user_profile)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def view_profile(request, user_id):
+    user = User.objects.get(pk=user_id)
+    user_profile = UserProfile.objects.get(user=user)
+    response_data = {
+        'user_id': user_id,
+        'username': user.username,
+        'user_img': user_profile.user_image,
+        'user_position': user_profile.user_position,
+        'user_info': user_profile.user_info,
+        'user_hash': user_profile.user_hash,
+        'success_count': user_profile.success_count
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
