@@ -14,6 +14,7 @@ from rest_framework.authtoken.models import Token
 from ..serializers.user_serializer import UserSerializer, UserAuthenticationSerializer, UserProfileSerializer
 from .utils import generate_temp_password, send_temp_password_email
 from ..models import UserProfile
+from ..image_uploader import S3ImgUploader
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -103,10 +104,11 @@ def delete_user(request):
 def write_profile(request):
     serializer = UserProfileSerializer(data=request.data)
     if serializer.is_valid():
-        image_file = request.data.get('user_img')
+        image_file = request.FILES['user_img']
+        url = S3ImgUploader(image_file).upload()
         user_profile = UserProfile.objects.create(
-            user=request.user,
-            image=image_file,
+            user=User.objects.get(pk=request.data['user']),
+            user_image=url,
             user_position=serializer.validated_data.get('user_position'),
             user_info=serializer.validated_data.get('user_info'),
             user_hash=serializer.validated_data.get('user_hash'),
@@ -120,10 +122,13 @@ def write_profile(request):
 def view_profile(request, user_id):
     user = User.objects.get(pk=user_id)
     user_profile = UserProfile.objects.get(user=user)
+    object_key = user_profile.user_image
+    url = f'https://d3u19o4soz3vn3.cloudfront.net/img/{object_key}'
+
     response_data = {
         'user_id': user_id,
         'username': user.username,
-        'user_img': user_profile.user_image,
+        'user_img': url,
         'user_position': user_profile.user_position,
         'user_info': user_profile.user_info,
         'user_hash': user_profile.user_hash,
@@ -137,6 +142,9 @@ def edit_profile(request):
     user_profile = get_object_or_404(UserProfile, user=request.data.get('user'))
     serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
     if serializer.is_valid():
+        if 'user_img' in request.data:
+            url = S3ImgUploader(request.FILES['user_img'])
+            serializer.user_img = url.upload()
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
