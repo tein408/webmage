@@ -1,4 +1,5 @@
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -9,6 +10,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
 from ..serializers.user_serializer import UserSerializer, UserAuthenticationSerializer, UserProfileSerializer
 from .utils import generate_temp_password, send_temp_password_email
 from ..models import UserProfile
@@ -128,3 +130,13 @@ def view_profile(request, user_id):
         'success_count': user_profile.success_count
     }
     return Response(response_data, status=status.HTTP_200_OK)
+
+@swagger_auto_schema(method='patch', request_body=UserProfileSerializer)
+@api_view(['PATCH'])
+def edit_profile(request):
+    user_profile = get_object_or_404(UserProfile, user=request.data.get('user'))
+    serializer = UserProfileSerializer(user_profile, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
