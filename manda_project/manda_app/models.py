@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User  # User 모델을 가져오기
 from django.http import JsonResponse #
+from django.db.models import JSONField
 
 
 # Create your models here.
