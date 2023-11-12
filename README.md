@@ -5,8 +5,16 @@
 2023.10.17 ~ 2023.11.02
 
 # 주요 라이브러리
-- Django
-- Django Rest Framework
+1. Django
+    - 파이썬으로 제작된 오픈소스 웹 프레임워크
+    - MVT pattern 사용, ORM 지원
+2. Django Rest Framework
+    - RESTful API 서버를 쉽게 구축할 수 있도록 도와주는 오픈소스 라이브러리
+3. Swagger
+    - DRF용 API 문서 자동화 라이브러리
+4. Coverage
+    - 테스트코드 커버리지 측정을 위한 라이브러리
+
 
 # 실행
 - 스웨거 접속
