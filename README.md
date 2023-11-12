@@ -6,7 +6,7 @@
 
 # 주요 라이브러리
 1. Django
-    - 파이썬으로 제작된 오픈소스 웹 프레임워크
+    - Python으로 제작된 오픈소스 웹 프레임워크
     - MVT pattern 사용, ORM 지원
 2. Django Rest Framework
     - RESTful API 서버를 쉽게 구축할 수 있도록 도와주는 오픈소스 라이브러리
