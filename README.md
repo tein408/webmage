@@ -19,7 +19,7 @@
 
 - 테스트 코드 실행
 
-    ```
+    ```shell
     # 테스트코드 실행
     $] coverage run manage.py test
 
